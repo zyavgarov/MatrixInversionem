@@ -1,9 +1,7 @@
 //
 // Created by pierre on 23.09.2021.
 //
-
-#include <malloc.h>
-#include <stdlib.h>
+#include "matrix_reading.h"
 
 int max (int i, int j) {
     if (i > j) {
@@ -13,30 +11,36 @@ int max (int i, int j) {
     }
 }
 
-int read_matrix (int n, double **A, int k, char *filename) {
+int read_matrix (int n, double ***A, int k, char *filename) {
     /* the program generates matrix using parameter k as defined in manual
      * Errors:
      * -1 - No file
      * -2 - Wrong data
      * -3 - Wrong k
      */
-    A = (double **) malloc (n * sizeof (double **));
-    // MORE ACCURATE MEMORY CONSUMPTION AND CLEANING NEEDED
-    // ALSO MALLOC FOR EVERY A[i] needs to be added
+    *A = (double **) malloc (n * sizeof (double *));
+    for (int i = 0; i < n; ++i) {
+        (*A)[i] = (double *) malloc (n * sizeof (double));
+    }
     if (k == 0) {
         // reading matrix from file
         FILE *input;
-        int err;
         input = fopen (filename, "r");
         if (input == NULL) {
-            free (A);
+            for (int i = 0; i < n; ++i) {
+                free ((*A)[i]);
+            }
+            free (*A);
             return -1;
         }
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
-                if (fscanf (input, "%lf", &A[i][j]) <= 0) {
+                if (fscanf (input, "%lf", &((*A)[i][j])) <= 0) {
                     fclose (input);
-                    free (A);
+                    for (int u = 0; u < n; ++u) {
+                        free ((*A)[u]);
+                    }
+                    free (*A);
                     return -2;
                 };
             }
@@ -46,28 +50,33 @@ int read_matrix (int n, double **A, int k, char *filename) {
         // that branch and three next are using formulae to fill the matrix
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
-                A[i][j] = n - max (i, j) + 1;
+                (*A)[i][j] = n - max (i, j) + 1;
             }
         }
     } else if (k == 2) {
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
-                A[i][j] = max (i, j);
+                (*A)[i][j] = max (i, j);
             }
         }
     } else if (k == 3) {
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
-                A[i][j] = abs (i - j);
+                (*A)[i][j] = abs (i - j);
             }
         }
     } else if (k == 4) {
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
-                A[i][j] = (double) 1 / abs (i + j - 1);
+                (*A)[i][j] = (double) 1 / abs (i + j - 1);
             }
         }
     } else {
-        return 0; // WRONG K. EXIT ACTIONS TO BE DONE
+        for (int u = 0; u < n; ++u) {
+            free ((*A)[u]);
+        }
+        free (*A);
+        return -3;
     }
+    return 0;
 }
