@@ -50,13 +50,13 @@ int read_matrix (int n, double ***A, int k, char *filename) {
         // that branch and three next are using formulae to fill the matrix
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
-                (*A)[i][j] = n - max (i, j) + 1;
+                (*A)[i][j] = n - max (i + 1, j + 1) + 1;
             }
         }
     } else if (k == 2) {
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
-                (*A)[i][j] = max (i, j);
+                (*A)[i][j] = max (i + 1, j + 1);
             }
         }
     } else if (k == 3) {
@@ -68,7 +68,7 @@ int read_matrix (int n, double ***A, int k, char *filename) {
     } else if (k == 4) {
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
-                (*A)[i][j] = (double) 1 / abs (i + j - 1);
+                (*A)[i][j] = (double) 1 / abs (i + j + 1);
             }
         }
     } else {
