@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <malloc.h>
-#define EPS 0.0005
+#define EPS 0.0000005
 // EPS defines whether the numbers are equivalent to each other
 void show_matrix (int m, int n, double ***A);
 void show (int n, int m, double ***A, double ***X, double time);
