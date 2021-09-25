@@ -2,6 +2,7 @@
 // Created by pierre on 23.09.2021.
 //
 #include "matrix_inversion.h"
+#include "misc.h"
 
 int inverse_matrix (int n, double ***A, double ***X) {
     /* inverses the matrix A and writes result to X
@@ -28,44 +29,43 @@ int inverse_matrix (int n, double ***A, double ***X) {
         B[i] = (double *) malloc (n * (sizeof (double *)));
     }
     for (int i = 0; i < n; ++i) {
-        for (int j = i; j < n; ++j) {
+        for (int j = 0; j < n; ++j) {
             B[i][j] = (*A)[i][j];
         }
     }
     // Gauss's method
-    int *r = (int *) malloc (n * sizeof (int *)); // this is row renumeration by Gauss method
-    for (int i = 0; i < n; ++i) {
-        r[i] = i;
-    }
     for (int k = 0; k < n; ++k) {
         // this iteration is a step of Gauss algorithm
-        int t = -1;
-        for (int j = 0; j < n; ++j) {
-            if (B[k][j] != 0) {
+        for (int j = k; j < n; ++j) {
+            if (fabs (B[k][j]) >= fabs (B[k][k])) {
                 // swapping the renumeration
-                t = r[k];
-                r[k] = r[j];
-                r[j] = t;
-                break;
+                for (int i = 0; i < n; ++i) {
+                    double d = B[i][k];
+                    B[i][k] = B[i][j];
+                    B[i][j] = d;
+                    d = (*X)[i][k];
+                    (*X)[i][k] = (*X)[i][j];
+                    (*X)[i][j] = d;
+                }
             }
         }
-        if (t == -1) {
+        if (is_0 (B[k][k])) {
             for (int i = 0; i < n; ++i) {
                 free ((*X)[i]);
             }
             free (*X);
-            free (r);
             return -1;
         }
+        double head_row = B[k][k];
         for (int i = 0; i < n; ++i) {
-            B[i][r[k]] /= B[k][r[k]];
-            (*X)[i][r[k]] /= B[k][r[k]];
+            B[i][k] /= head_row;
+            (*X)[i][k] /= head_row;
         }
-        for (int j = k; j < n; ++j) {
-            double head_row = B[k][j];
+        for (int j = k + 1; j < n; ++j) {
+            double head_row_in = B[k][j];
             for (int i = 0; i < n; ++i) {
-                B[i][r[j]] -= B[i][r[j]] * head_row;
-                (*X)[i][r[j]] -= B[i][r[j]] * head_row;
+                B[i][j] -= B[i][k] * head_row_in;
+                (*X)[i][j] -= (*X)[i][k] * head_row_in;
             }
         }
     }
@@ -73,9 +73,10 @@ int inverse_matrix (int n, double ***A, double ***X) {
     // going backwards
     for (int k = n - 1; k >= 0; --k) {
         for (int j = 0; j < k; ++j) {
+            double head_row = B[k][j];
             for (int i = 0; i < n; ++i) {
-                B[i][r[j]] -= B[i][r[k]];
-                (*X)[i][r[j]] -= B[i][r[k]];
+                B[i][j] -= B[i][k] * head_row;
+                (*X)[i][j] -= (*X)[i][k] * head_row;
             }
         }
     }
@@ -85,6 +86,5 @@ int inverse_matrix (int n, double ***A, double ***X) {
         free (B[i]);
     }
     free (B);
-    free (r);
     return 0;
 }
