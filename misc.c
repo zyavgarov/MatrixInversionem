@@ -10,25 +10,15 @@ void show_matrix (int m, int n, double ***A) {
         m_ = n;
     }
     for (int i = 0; i < m_; ++i) {
-        for (int j = 0; j < n; ++j) {
-            printf ("  %10.3lf", (*A)[i][j]);
+        for (int j = 0; j < m_; ++j) {
+            printf (" %10.3e", (*A)[i][j]);
         }
         printf ("\n");
     }
     printf ("\n");
 }
 
-double norm (int n, double ***A) {
-    double sum = 0;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            sum += (*A)[i][j] * (*A)[i][j];
-        }
-    }
-    return sqrt (sum);
-}
-
-void show (int n, int m, double ***A, double ***X, double time) {
+void show (int n, int m, int k, char *filename, double ***A, double ***X, double time) {
     /* shows first m strings of matrix X
      * if m == 0 shows time and index of false
      * if m == -1 only matrix X is shown
@@ -36,37 +26,38 @@ void show (int n, int m, double ***A, double ***X, double time) {
     if (m == -1) {
         show_matrix (n, n, X);
     } else {
-        double **S; // A*X - E
-        S = (double **) malloc (n * sizeof (double **));
+        // Initializing A
+        read_matrix (n, A, k, filename);
+        
+        // Error measure
+        double sum = 0;
         for (int i = 0; i < n; ++i) {
-            S[i] = (double *) malloc (n * sizeof (double *));
-            // computing the line
             for (int j = 0; j < n; ++j) {
+                double cell;
                 if (i == j) {
-                    S[i][j] = -1;
+                    cell = -1;
                 } else {
-                    S[i][j] = 0;
+                    cell = 0;
                 }
-                for (int k = 0; k < n; ++k) {
-                    S[i][j] += (*A)[i][k] * (*X)[k][j];
+                for (int l = 0; l < n; ++l) {
+                    cell += (*A)[i][l] * (*X)[l][j];
                 }
+                sum += pow (cell, 2);
             }
         }
+        double norm = sqrt (sum);
+        
         if (m == 0) {
-            printf ("Error: %lf\n", norm (0, &S));
-            printf ("Time: %10.3lf\n", time);
+            printf ("%10.3e\n", norm);
+            printf ("%10.3e\n", time);
         } else {
-            printf ("Time: %10.3lf\n", time);
+            printf ("%10.3e\n", time);
             printf ("Matrix A:\n");
             show_matrix (m, n, A);
             printf ("Matrix A^(-1)\n");
             show_matrix (m, n, X);
-            printf ("Error: %lf\n", norm (n, &S));
+            printf ("%10.3e\n", norm);
         }
-        for (int i = 0; i < n; ++i) {
-            free (S[i]);
-        }
-        free (S);
     }
 }
 
@@ -79,4 +70,15 @@ int is_0 (double x) {
     } else {
         return 0;
     }
+}
+
+void clean_memory (double ***A, double ***X, int n) {
+    for (int i = 0; i < n; ++i) {
+        free ((*A)[i]);
+    }
+    free (*A);
+    for (int i = 0; i < n; ++i) {
+        free ((*X)[i]);
+    }
+    free (*X);
 }

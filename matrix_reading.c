@@ -18,29 +18,17 @@ int read_matrix (int n, double ***A, int k, char *filename) {
      * -2 - Wrong data
      * -3 - Wrong k
      */
-    *A = (double **) malloc (n * sizeof (double *));
-    for (int i = 0; i < n; ++i) {
-        (*A)[i] = (double *) malloc (n * sizeof (double));
-    }
     if (k == 0) {
         // reading matrix from file
         FILE *input;
         input = fopen (filename, "r");
         if (input == NULL) {
-            for (int i = 0; i < n; ++i) {
-                free ((*A)[i]);
-            }
-            free (*A);
             return -1;
         }
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
                 if (fscanf (input, "%lf", &((*A)[i][j])) <= 0) {
                     fclose (input);
-                    for (int u = 0; u < n; ++u) {
-                        free ((*A)[u]);
-                    }
-                    free (*A);
                     return -2;
                 };
             }
@@ -72,10 +60,6 @@ int read_matrix (int n, double ***A, int k, char *filename) {
             }
         }
     } else {
-        for (int u = 0; u < n; ++u) {
-            free ((*A)[u]);
-        }
-        free (*A);
         return -3;
     }
     return 0;
