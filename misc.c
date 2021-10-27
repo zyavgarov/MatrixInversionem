@@ -4,61 +4,69 @@
 
 #include "misc.h"
 
-void show_matrix (int m, int n, double ***A) {
-    int m_ = m;
-    if (m > n) {
-        m_ = n;
+double get_error_norm (double **A, double **X, int n);
+
+void show_matrix (int m, int n, int l, double **A) {
+    // prints matrix n*l to satisfy p.7
+    if (m < n) {
+        n = m;
     }
-    for (int i = 0; i < m_; ++i) {
-        for (int j = 0; j < m_; ++j) {
-            printf (" %10.3e", (*A)[i][j]);
+    if (m < l) {
+        l = m;
+    }
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < l; ++j) {
+            printf (" %10.3e", A[i][j]);
         }
         printf ("\n");
     }
     printf ("\n");
 }
 
-void show (int n, int m, int k, char *filename, double ***A, double ***X, double time) {
+void show (int n, int m, int k, char *filename, double **A, double **X, double time) {
     /* shows first m strings of matrix X
      * if m == 0 shows time and index of false
      * if m == -1 only matrix X is shown
      */
     if (m == -1) {
-        show_matrix (n, n, X);
+        show_matrix (n, n, 0, X);
     } else {
         // Initializing A
         read_matrix (n, A, k, filename);
-        
-        // Error measure
-        double sum = 0;
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < n; ++j) {
-                double cell;
-                if (i == j) {
-                    cell = -1;
-                } else {
-                    cell = 0;
-                }
-                for (int l = 0; l < n; ++l) {
-                    cell += (*A)[i][l] * (*X)[l][j];
-                }
-                sum += pow (cell, 2);
-            }
-        }
-        double norm = sqrt (sum);
+        double norm = get_error_norm (A, X, n);
         
         if (m == 0) {
             printf ("%10.3e\n", norm);
-            printf ("%10.3e\n", time);
+            printf ("%lf\n", time);
         } else {
-            printf ("%10.3e\n", time);
+            printf ("%lf\n", time);
             printf ("Matrix A:\n");
-            show_matrix (m, n, A);
+            show_matrix (m, n, 0, A);
             printf ("Matrix A^(-1)\n");
-            show_matrix (m, n, X);
+            show_matrix (m, n, 0, X);
             printf ("%10.3e\n", norm);
         }
     }
+}
+
+double get_error_norm (double **A, double **X, int n) {
+    // Error measure
+    double sum = 0;
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            double cell;
+            if (i == j) {
+                cell = -1;
+            } else {
+                cell = 0;
+            }
+            for (int l = 0; l < n; ++l) {
+                cell += A[i][l] * X[l][j];
+            }
+            sum += pow (cell, 2);
+        }
+    }
+    return sqrt (sum);
 }
 
 int is_0 (double x) {
@@ -72,13 +80,13 @@ int is_0 (double x) {
     }
 }
 
-void clean_memory (double ***A, double ***X, int n) {
+void clean_memory (double **A, double **X, int n) {
     for (int i = 0; i < n; ++i) {
-        free ((*A)[i]);
+        free (A[i]);
     }
-    free (*A);
+    free (A);
     for (int i = 0; i < n; ++i) {
-        free ((*X)[i]);
+        free (X[i]);
     }
-    free (*X);
+    free (X);
 }

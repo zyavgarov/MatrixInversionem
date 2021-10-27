@@ -7,5 +7,6 @@
 #include <malloc.h>
 #include <stdlib.h>
 int max (int i, int j);
-int read_matrix (int n, double ***A, int k, char *filename);
+int read_matrix (int n, double **A, int k, char *filename);
+double f (int k, int n, int i, int j);
 #endif //MATRIXINVERSIONEM__MATRIX_READING_H_

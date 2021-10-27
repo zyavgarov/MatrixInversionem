@@ -57,30 +57,30 @@ int main (int argc, char **argv) {
         X[i] = (double *) malloc (n * (sizeof (double *)));
     }
     
-    err = read_matrix (n, &A, k, filename);
+    err = read_matrix (n, A, k, filename);
     if (err == -1) {
         printf ("File not found\n");
-        clean_memory (&A, &X, n);
+        clean_memory (A, X, n);
         return -4;
     } else if (err == -2) {
         printf ("Incorrect data in file\n");
-        clean_memory (&A, &X, n);
+        clean_memory (A, X, n);
         return -5;
     } else if (err == -3) {
         printf ("Extra or lack of arguments\n");
-        clean_memory (&A, &X, n);
+        clean_memory (A, X, n);
     }
     
     clock_t begin = clock ();
-    err = inverse_matrix (n, &A, &X);
+    err = inverse_matrix (n, A, X);
     clock_t end = clock ();
     if (err == -1) {
         printf ("The matrix is singular\n");
-        clean_memory (&A, &X, n);
+        clean_memory (A, X, n);
         return -6;
     }
-    show (n, m, k, filename, &A, &X, (double) (end - begin) / CLOCKS_PER_SEC);
+    show (n, m, k, filename, A, X, (double) (end - begin) / CLOCKS_PER_SEC);
     
-    clean_memory (&A, &X, n);
+    clean_memory (A, X, n);
     return 0;
 }
