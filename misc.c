@@ -4,8 +4,6 @@
 
 #include "misc.h"
 
-double get_error_norm (double **A, double **X, int n);
-
 void show_matrix (int m, int n, int l, double **A) {
     // prints matrix n*l to satisfy p.7
     if (m < n) {
@@ -29,7 +27,7 @@ void show (int n, int m, int k, char *filename, double **A, double **X, double t
      * if m == -1 only matrix X is shown
      */
     if (m == -1) {
-        show_matrix (n, n, 0, X);
+        show_matrix (n, n, n, X);
     } else {
         // Initializing A
         read_matrix (n, A, k, filename);
@@ -41,9 +39,9 @@ void show (int n, int m, int k, char *filename, double **A, double **X, double t
         } else {
             printf ("%lf\n", time);
             printf ("Matrix A:\n");
-            show_matrix (m, n, 0, A);
+            show_matrix (m, n, n, A);
             printf ("Matrix A^(-1)\n");
-            show_matrix (m, n, 0, X);
+            show_matrix (m, n, n, X);
             printf ("%10.3e\n", norm);
         }
     }

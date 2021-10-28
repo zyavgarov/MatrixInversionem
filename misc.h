@@ -14,4 +14,5 @@ void show_matrix (int m, int n, int l, double **A);
 void show (int n, int m, int k, char *filename, double **A, double **X, double time);
 int is_0 (double x);
 void clean_memory (double **A, double **X, int n);
+double get_error_norm (double **A, double **X, int n);
 #endif //MATRIXINVERSIONEM_CMAKE_BUILD_DEBUG_MISC_H_
